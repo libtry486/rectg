@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 无关内容和广告不会被受理
-    url: https://github.com/jackvale/rectg/issues
-    about: 请不要提交广告、频道收录、推广链接、合作报价或其他无关内容。
+  - name: 只接受频道收录申请
+    url: https://github.com/jackvale/rectg/issues/new?template=channel_submission.md
+    about: 请使用“频道收录申请”模板提交 Telegram 频道、群组或机器人收录。广告、刷量推广、合作报价、成人/违法内容、无关链接或重复提交不会被受理。
