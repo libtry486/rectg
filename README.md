@@ -41,10 +41,10 @@
 
 <table>
   <tr>
-    <td align="center"><strong>554</strong><br><sub>总收录 · 频道 / 群组 / 机器人</sub></td>
+    <td align="center"><strong>552</strong><br><sub>总收录 · 频道 / 群组 / 机器人</sub></td>
     <td align="center"><strong>22</strong><br><sub>分类 · 主题索引</sub></td>
     <td align="center"><strong>269</strong><br><sub>频道 · Channel</sub></td>
-    <td align="center"><strong>285</strong><br><sub>群组 · Group</sub></td>
+    <td align="center"><strong>283</strong><br><sub>群组 · Group</sub></td>
   </tr>
 </table>
 
@@ -59,7 +59,7 @@
   </tr>
   <tr>
     <td valign="top"><a href="#section-channel"><strong>频道</strong></a><br><a href="#section-channel-1">🆕 新发现频道</a> <sub>10</sub><br><a href="#section-channel-2">📰 新闻快讯</a> <sub>50</sub><br><a href="#section-channel-3">💻 数码科技</a> <sub>29</sub><br><a href="#section-channel-4">👨‍💻 开发运维</a> <sub>13</sub><br><a href="#section-channel-5">🔒 信息安全</a> <sub>3</sub><br><a href="#section-channel-6">🧰 软件工具</a> <sub>19</sub><br><a href="#section-channel-7">☁️ 网盘资源</a> <sub>7</sub><br><a href="#section-channel-8">🎬 影视剧集</a> <sub>19</sub><br><a href="#section-channel-9">🎵 音乐音频</a> <sub>14</sub><br><a href="#section-channel-10">🎐 动漫次元</a> <sub>12</sub><br><a href="#section-channel-11">🎮 游戏娱乐</a> <sub>6</sub><br><a href="#section-channel-12">✈️ 科学上网</a> <sub>4</sub><br><a href="#section-channel-13">🪙 加密货币</a> <sub>2</sub><br><a href="#section-channel-14">📚 学习阅读</a> <sub>23</sub><br><a href="#section-channel-15">🎨 创意设计</a> <sub>3</sub><br><a href="#section-channel-16">📡 社媒搬运</a> <sub>7</sub><br><a href="#section-channel-17">👗 生活消费</a> <sub>16</sub><br><a href="#section-channel-18">💬 闲聊交友</a> <sub>12</sub><br><a href="#section-channel-19">🗂️ 综合导航</a> <sub>3</sub><br><a href="#section-channel-20">🌐 综合其他</a> <sub>17</sub></td>
-    <td valign="top"><a href="#section-group"><strong>群组</strong></a><br><a href="#section-group-1">📰 新闻快讯</a> <sub>11</sub><br><a href="#section-group-2">💻 数码科技</a> <sub>50</sub><br><a href="#section-group-3">👨‍💻 开发运维</a> <sub>35</sub><br><a href="#section-group-4">🔒 信息安全</a> <sub>1</sub><br><a href="#section-group-5">🧰 软件工具</a> <sub>15</sub><br><a href="#section-group-6">☁️ 网盘资源</a> <sub>5</sub><br><a href="#section-group-7">🎬 影视剧集</a> <sub>14</sub><br><a href="#section-group-8">🎵 音乐音频</a> <sub>15</sub><br><a href="#section-group-9">🎐 动漫次元</a> <sub>5</sub><br><a href="#section-group-10">🎮 游戏娱乐</a> <sub>13</sub><br><a href="#section-group-11">✈️ 科学上网</a> <sub>12</sub><br><a href="#section-group-12">🪙 加密货币</a> <sub>5</sub><br><a href="#section-group-13">📚 学习阅读</a> <sub>16</sub><br><a href="#section-group-14">🎨 创意设计</a> <sub>1</sub><br><a href="#section-group-15">🏀 体育运动</a> <sub>1</sub><br><a href="#section-group-16">👗 生活消费</a> <sub>12</sub><br><a href="#section-group-17">🌍 地区社群</a> <sub>9</sub><br><a href="#section-group-18">💬 闲聊交友</a> <sub>9</sub><br><a href="#section-group-19">🗂️ 综合导航</a> <sub>8</sub><br><a href="#section-group-20">🌐 综合其他</a> <sub>48</sub></td>
+    <td valign="top"><a href="#section-group"><strong>群组</strong></a><br><a href="#section-group-1">📰 新闻快讯</a> <sub>11</sub><br><a href="#section-group-2">💻 数码科技</a> <sub>50</sub><br><a href="#section-group-3">👨‍💻 开发运维</a> <sub>35</sub><br><a href="#section-group-4">🔒 信息安全</a> <sub>1</sub><br><a href="#section-group-5">🧰 软件工具</a> <sub>15</sub><br><a href="#section-group-6">☁️ 网盘资源</a> <sub>5</sub><br><a href="#section-group-7">🎬 影视剧集</a> <sub>14</sub><br><a href="#section-group-8">🎵 音乐音频</a> <sub>15</sub><br><a href="#section-group-9">🎐 动漫次元</a> <sub>5</sub><br><a href="#section-group-10">🎮 游戏娱乐</a> <sub>13</sub><br><a href="#section-group-11">✈️ 科学上网</a> <sub>11</sub><br><a href="#section-group-12">🪙 加密货币</a> <sub>5</sub><br><a href="#section-group-13">📚 学习阅读</a> <sub>16</sub><br><a href="#section-group-14">🎨 创意设计</a> <sub>1</sub><br><a href="#section-group-15">🏀 体育运动</a> <sub>1</sub><br><a href="#section-group-16">👗 生活消费</a> <sub>12</sub><br><a href="#section-group-17">🌍 地区社群</a> <sub>9</sub><br><a href="#section-group-18">💬 闲聊交友</a> <sub>9</sub><br><a href="#section-group-19">🗂️ 综合导航</a> <sub>8</sub><br><a href="#section-group-20">🌐 综合其他</a> <sub>47</sub></td>
   </tr>
 </table>
 
@@ -836,7 +836,7 @@
 ### ✈️ 科学上网
 
 <details open>
-<summary><strong>12 个资源</strong> · <a href="https://www.rectg.com/?c=%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91">站内查看</a></summary>
+<summary><strong>11 个资源</strong> · <a href="https://www.rectg.com/?c=%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91">站内查看</a></summary>
 
 | 资源 | 人数 | 简介 |
 | --- | ---: | --- |
@@ -851,7 +851,6 @@
 | [Netch 使用交流群组](https://t.me/Netch_Discuss_Group) | 4,533 | 支持 Socks5、SS、SSR、VMess、Trojan 代理 UDP NAT FullCone |
 | [离港 ̲̅V̲̅I̲̅P̅ 候机室 机场交流🅥](https://t.me/airport_chat) | 3,866 | 机场交流 / 机场那些事 / 机圈吃瓜 群规: 平等而友好地交流，营造良好聊天氛围！ 主要讨论机场相关事宜，当然也欢迎讨论其他不违反群规的内容! 禁止键政！禁止键政！禁止键政！ ！ 离... |
 | [BIS科学上网](https://t.me/BISproject) | 2,268 | Browse Internet Security科学 上网 官方Telegram频道： 官方Telegram群组 |
-| [Swarm免费梯子翻墙](https://t.me/hxisj8whsv) | 348 | 最新免费安卓梯子下载链接: 最新免费iOS+Windows梯子下载链接: |
 
 </details>
 
@@ -1008,7 +1007,7 @@
 ### 🌐 综合其他
 
 <details open>
-<summary><strong>48 个资源</strong> · <a href="https://www.rectg.com/?c=%E7%BB%BC%E5%90%88%E5%85%B6%E4%BB%96">站内查看</a></summary>
+<summary><strong>47 个资源</strong> · <a href="https://www.rectg.com/?c=%E7%BB%BC%E5%90%88%E5%85%B6%E4%BB%96">站内查看</a></summary>
 
 | 资源 | 人数 | 简介 |
 | --- | ---: | --- |
@@ -1043,7 +1042,6 @@
 | [业余无线电爱好者HAM 中继查询](https://t.me/ham002) | 1,196 | 本群为HAM业余无线电内容讨论为主，禁辱骂行为。 如果自动入群测试出现故障，请主动联系以下管理员手动批准入群。 本群链接 请员 备用入群 备用入群 备用入群 |
 | [SSRSpeed N 使用交流](https://t.me/SSRSpeedN) | 888 | You can view and join right away. |
 | [ExCloud](https://t.me/excloud) | 820 | 网址： 公告群 |
-| [印度伟哥药店](https://t.me/shenyebaojianshi666) | 802 | You can view and join right away. |
 | [酷安](https://t.me/cool_apk) | 709 | 禁止人身攻击 |
 | [即時投資消息推送](https://t.me/touzi8) | 691 | 讨论投资股市的群 English： 繁體中文： 簡體中文 |
 | [CSGO](https://t.me/csgocn) | 686 | CS:GO 中文群组 关联频道: |
