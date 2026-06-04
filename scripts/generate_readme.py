@@ -7,7 +7,6 @@ README.md 生成器
     python3 scripts/generate_readme.py
 """
 import argparse
-import base64
 import sqlite3
 import html
 import re
@@ -20,6 +19,8 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT_DIR / "data" / "rectg.db"
 README_PATH = ROOT_DIR / "README.md"
 README_DESC_LIMIT = 88
+SITE_URL = "https://www.rectg.com/"
+SUBMISSION_URL = "https://github.com/jackvale/rectg/issues/new?template=channel_submission.md"
 
 # 一级大类
 TYPE_ORDER = [
@@ -53,6 +54,7 @@ CATEGORY_ORDER = [
     "🗂️ 综合导航",
     "🌐 综合其他"
 ]
+
 
 def make_anchor(section: str, category_index: Optional[int] = None) -> str:
     """生成稳定锚点，避免依赖 GitHub 对中文/emoji 标题的默认锚点规则。"""
@@ -94,22 +96,14 @@ def truncate_text(text: str, limit: int = README_DESC_LIMIT) -> str:
         return text
     return text[:limit].rstrip() + "..."
 
-def encode_hidden_desc(text: str) -> str:
-    """把完整简介藏在 HTML 注释里，供网站数据构建使用。"""
-    return base64.b64encode(text.encode("utf-8")).decode("ascii")
-
 def render_desc_cell(text: str) -> str:
-    """渲染 README 简介单元格，同时保留完整简介给构建脚本。"""
+    """渲染 README 简介单元格，保持表格原文干净。"""
     full_text = compact_text(text)
     if not full_text:
         return "-"
 
     visible_text = truncate_text(full_text)
-    visible = escape_table_text(visible_text) or "-"
-    if visible_text == full_text:
-        return visible
-
-    return f"{visible} <!-- rectg-desc:{encode_hidden_desc(full_text)} -->"
+    return escape_table_text(visible_text) or "-"
 
 def sorted_categories(categories: dict[str, list[dict]]) -> list[str]:
     """按照预设顺序输出分类，其余分类稳定追加到最后。"""
@@ -129,11 +123,13 @@ def build_stats_table(type_counts: dict[str, int], category_count: int) -> str:
     """构建 README 顶部数据概览。"""
     total = sum(type_counts.values())
     stat_items = [
-        ("总收录", format_count(total), "频道与群组"),
+        ("总收录", format_count(total), "频道 / 群组 / 机器人"),
         ("分类", format_count(category_count), "主题索引"),
         ("频道", format_count(type_counts.get("channel", 0)), "Channel"),
         ("群组", format_count(type_counts.get("group", 0)), "Group"),
     ]
+    if type_counts.get("bot", 0) > 0:
+        stat_items.append(("机器人", format_count(type_counts.get("bot", 0)), "Bot"))
 
     cells = []
     for label, value, hint in stat_items:
@@ -228,22 +224,49 @@ def generate_readme(conn: sqlite3.Connection) -> str:
     }
     lines.append("<h1 align=\"center\">rectg</h1>")
     lines.append("")
-    lines.append("<p align=\"center\">Telegram 中文频道与群组精选索引</p>")
+    lines.append("<p align=\"center\">Telegram 中文频道、群组与机器人精选索引</p>")
     lines.append("")
     lines.append("<p align=\"center\">")
-    lines.append("  <a href=\"https://www.rectg.com/\"><strong>在线浏览</strong></a>")
+    lines.append(f"  <a href=\"{SITE_URL}\"><strong>在线浏览</strong></a>")
     lines.append("  ·")
-    lines.append("  <a href=\"https://github.com/jackvale/rectg/issues/new\">提交收录</a>")
+    lines.append(f"  <a href=\"{SUBMISSION_URL}\">提交收录</a>")
     lines.append("</p>")
     lines.append("")
-    lines.append("> **rectg** 持续收录高质量 Telegram 中文频道与群组，结合自动化抓取与人工整理，帮助你更高效地发现值得关注的 TG 资源。")
+    lines.append("> **rectg** 持续收录高质量 Telegram 中文频道、群组与机器人，结合自动化抓取与人工整理，帮助你更高效地发现值得关注的 TG 资源。")
     lines.append("> ")
     lines.append("> 本项目基于公开信息整理，仅作导航与研究参考；请自行甄别内容并遵守所在地法律法规。")
+    lines.append("")
+    lines.append("## 项目特点")
+    lines.append("")
+    lines.append("- 覆盖新闻快讯、数码科技、开发运维、软件工具、影视剧集、学习阅读等中文 Telegram 主题资源。")
+    lines.append("- 数据结合自动化抓取、规则过滤与人工整理，按频道、群组、机器人和主题分类输出。")
+    lines.append("- 订阅数和成员数仅作发现参考，不代表项目背书；资源简介会做压缩展示，完整信息以 Telegram 页面为准。")
+    lines.append(f"- 在线站点支持搜索、分类筛选和详情页浏览：[{SITE_URL}]({SITE_URL})。")
+    lines.append("")
+    lines.append("## 如何使用")
+    lines.append("")
+    lines.append(f"1. 优先访问 [{SITE_URL}]({SITE_URL}) 搜索或筛选资源。")
+    lines.append("2. 在下方 `快速导航` 中按频道、群组和主题跳转到对应目录。")
+    lines.append("3. 点击资源名称会跳转到 Telegram，请在加入前自行确认内容质量、活跃度和规则。")
+    lines.append("")
+    lines.append("## 收录与反馈")
+    lines.append("")
+    lines.append(f"- 新资源推荐请通过 [收录申请]({SUBMISSION_URL}) 提交。")
+    lines.append("- 提交时请提供资源名称、完整链接、类型、简介、语言和主题，方便维护时判断是否适合收录。")
+    lines.append("- 不接受广告刷量、成人或违法内容、无关链接、批量灌水和重复提交。")
+    lines.append("")
+    lines.append("## 收录原则与免责声明")
+    lines.append("")
+    lines.append("- 本项目只整理公开可见信息，不拥有、不运营、不代表任何被收录的 Telegram 资源。")
+    lines.append("- 分类、简介和人数可能因 Telegram 页面变化、抓取时点或人工判断而滞后。")
+    lines.append("- 请遵守所在地法律法规和 Telegram 社区规则，自行承担访问、加入和使用相关资源的风险。")
     lines.append("")
 
     lines.append("## 数据概览")
     lines.append("")
     lines.append(build_stats_table(type_counts, len(all_categories)))
+    lines.append("")
+    lines.append("以下数据由当前 SQLite 数据库自动生成，完整目录保留在 README 中，便于 GitHub 内浏览和引用。")
     lines.append("")
     lines.append("## 快速导航")
     lines.append("")

@@ -33,15 +33,6 @@ function main() {
     }
 
     function extractDesc(descCell) {
-        const hiddenMatch = descCell.match(/<!--\s*rectg-desc:([A-Za-z0-9+/=]+)\s*-->/);
-        if (hiddenMatch) {
-            try {
-                return Buffer.from(hiddenMatch[1], 'base64').toString('utf8').trim();
-            } catch {
-                // Fall back to the visible README text if the hidden payload is malformed.
-            }
-        }
-
         return cleanMarkdownText(descCell.replace(/<!--.*?-->/g, '').trim());
     }
 
