@@ -1,22 +1,30 @@
-const puppeteer = require('puppeteer');
-(async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto('http://localhost:4321/p/tnews365');
-  const styles = await page.evaluate(() => {
-    const header = document.querySelector('.detail-header');
-    const info = document.querySelector('.header-info');
-    const title = document.querySelector('.detail-title');
-    return {
-      headerW: header?.getBoundingClientRect().width,
-      infoW: info?.getBoundingClientRect().width,
-      titleW: title?.getBoundingClientRect().width,
-      headerFlex: window.getComputedStyle(header).display,
-      infoFlex: window.getComputedStyle(info).flex,
-      infoMinWidth: window.getComputedStyle(info).minWidth,
-      parentW: header?.parentElement.getBoundingClientRect().width
-    };
-  });
-  console.log(JSON.stringify(styles, null, 2));
-  await browser.close();
-})();
+import fs from 'fs';
+
+const css = fs.readFileSync('src/styles/style.css', 'utf-8');
+const failures = [];
+
+if (/(^|\n)\s*main\s*\{/.test(css)) {
+  failures.push('Use #app-scoped selectors instead of a global main selector.');
+}
+
+if (/(^|\n)\s*header\s*\{/.test(css)) {
+  failures.push('Use #app-scoped selectors instead of a global header selector.');
+}
+
+[
+  '.mobile-category-strip',
+  '.result-status',
+  '.copy-label',
+  '#app > main > header',
+].forEach((selector) => {
+  if (!css.includes(selector)) {
+    failures.push(`Missing expected selector: ${selector}`);
+  }
+});
+
+if (failures.length) {
+  console.error(failures.join('\n'));
+  process.exit(1);
+}
+
+console.log('✅ css ok');

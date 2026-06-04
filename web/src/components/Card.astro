@@ -32,23 +32,24 @@ const colorClass = getAvatarColorClass(firstLetter);
             )}
         </div>
         <div class="card-title-wrap">
-            <a href={`/p/${id}`} class="card-title" title={title}>{title}</a>
+            <a href={`/p/${id}/`} class="card-title" title={title}>{title}</a>
             <div class="card-meta">
                 <span class="tag">{typeName}</span>
-                <span>👥 {countStr}</span>
+                {category && <span class="tag category-tag" title={category}>{category}</span>}
+                <span class="resource-count">人数 {countStr}</span>
             </div>
         </div>
     </div>
     <div class="card-desc" title={desc}>{desc || '没有描述'}</div>
     <div class="card-actions">
         <a class="card-action card-action-primary" href={url} target="_blank" rel="noopener noreferrer">直达</a>
-        <a class="card-action" href={`/p/${id}`}>详情</a>
+        <a class="card-action" href={`/p/${id}/`}>详情</a>
         <button class="card-action card-copy-btn" type="button" aria-label="复制链接" data-url={url}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
             </svg>
-            复制
+            <span class="copy-label">复制</span>
         </button>
     </div>
 </article>

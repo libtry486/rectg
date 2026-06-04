@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "node build-data.js && astro dev",
     "build": "node build-data.js && astro build",
+    "check": "node check.js && node check-css.js",
     "preview": "astro preview",
     "astro": "astro"
   },

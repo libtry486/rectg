@@ -1,16 +1,29 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Card from '../components/Card.astro';
-import { buildDirectoryData } from '../utils/data';
+import { absoluteUrl, buildDirectoryData, categoryPath, itemPath, SITE_URL } from '../utils/data';
 
-const { categories, validSections, allItems, featuredItems, totalItems, typeStats } = buildDirectoryData();
+const { categories, validSections, featuredItems, totalItems, typeStats } = buildDirectoryData();
+const sectionSummaries = validSections.map((group) => ({
+  id: group.meta.id,
+  icon: group.meta.icon,
+  name: group.meta.name,
+  fullName: group.meta.fullName,
+  count: group.items.length,
+}));
+const categoryCountById = new Map(sectionSummaries.map((section) => [section.id, section.count]));
 const initialSection = {
   id: 'featured',
-  icon: '★',
-  name: '精选推荐',
+  icon: '•',
+  name: '推荐资源',
   fullName: '精选推荐',
   items: featuredItems,
 };
+const summaryStats = [
+  { name: '总收录', count: totalItems },
+  { name: '分类', count: validSections.length },
+  ...typeStats,
+];
 const directoryPayload = JSON.stringify({
   sections: [
     initialSection,
@@ -23,13 +36,58 @@ const directoryPayload = JSON.stringify({
       items: group.items,
     })),
   ],
-  allItems,
 }).replace(/</g, '\\u003c');
 
-const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道与群组，支持分类浏览、关键词搜索、详情页和直达链接。`;
+const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道和群组，支持分类浏览、关键词搜索、详情页和直达链接。`;
+const homeJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE_URL}/#website`,
+    name: 'rectg',
+    url: `${SITE_URL}/`,
+    inLanguage: 'zh-CN',
+    description: pageDescription,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${SITE_URL}/#organization`,
+    name: 'rectg',
+    url: `${SITE_URL}/`,
+    logo: `${SITE_URL}/og-image.png`,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${SITE_URL}/#collection`,
+    url: `${SITE_URL}/`,
+    name: 'rectg Telegram 中文资源索引',
+    description: pageDescription,
+    inLanguage: 'zh-CN',
+    isPartOf: { '@id': `${SITE_URL}/#website` },
+    about: {
+      '@type': 'Thing',
+      name: 'Telegram 中文频道和群组',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `${SITE_URL}/#featured-items`,
+    name: 'rectg 精选推荐资源',
+    numberOfItems: featuredItems.length,
+    itemListElement: featuredItems.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: absoluteUrl(itemPath(item.id)),
+      name: item.title,
+    })),
+  },
+];
 ---
 
-<Layout description={pageDescription}>
+<Layout description={pageDescription} jsonLd={homeJsonLd}>
   <div id="app">
     <!-- 侧边栏 -->
     <aside id="sidebar">
@@ -55,19 +113,28 @@ const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道与群组
       </div>
       <nav id="category-nav">
         <div class="nav-section-label">分类</div>
-        <div class="nav-item active" data-id="featured">
-            <span class="nav-icon">★</span>
-            <span>精选推荐</span>
-        </div>
+        <a class="nav-item active" data-id="featured" href="/">
+            <span class="nav-icon">•</span>
+            <span>推荐资源</span>
+        </a>
         {categories.map(cat => (
-          <div class="nav-item" data-id={cat.id}>
+          <a class="nav-item" data-id={cat.id} href={categoryPath(cat.id)}>
               <span class="nav-icon">{cat.icon}</span>
               <span>{cat.name}</span>
-          </div>
+              <span class="nav-count">{categoryCountById.get(cat.id) || 0}</span>
+          </a>
         ))}
       </nav>
       <div class="sidebar-footer">
-        <a href="https://github.com/jackvale/rectg/issues/new" target="_blank" rel="noopener" class="submit-btn" title="提交新的频道或群组">
+        <div class="sidebar-stats" aria-label="收录统计">
+          {summaryStats.map(stat => (
+            <div class="sidebar-stat">
+              <span>{stat.name}</span>
+              <strong>{stat.count}</strong>
+            </div>
+          ))}
+        </div>
+        <a href="https://github.com/jackvale/rectg/issues/new?template=channel_submission.md" target="_blank" rel="noopener" class="submit-btn" title="提交新的频道或群组">
           提交收录
         </a>
       </div>
@@ -77,7 +144,7 @@ const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道与群组
     <div id="sidebar-overlay"></div>
 
     <!-- 主内容区 -->
-    <main>
+    <main class="home-main">
       <header>
         <div class="header-left">
           <button id="menu-btn" aria-label="菜单">
@@ -87,12 +154,28 @@ const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道与群组
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
-          <!-- 移动端显示的标题 -->
-          <h2 class="mobile-title">rectg</h2>
+          <a class="topbar-brand" href="/" aria-label="rectg 首页">rectg</a>
+        </div>
+
+        <div class="header-search">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="search-input" placeholder="搜索频道、群组、关键词或 t.me 地址" autocomplete="off" />
+            <button id="clear-search-btn" class="clear-search-btn" type="button" aria-label="清空搜索">
+              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div class="header-right">
           <a class="topbar-link" href="https://github.com/jackvale/rectg" target="_blank" rel="noopener">GitHub</a>
+          <a class="topbar-link" href="https://github.com/jackvale/rectg/issues/new?template=channel_submission.md" target="_blank" rel="noopener">提交</a>
           <button id="theme-toggle" aria-label="切换主题">
             <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -117,50 +200,34 @@ const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道与群组
         <div id="progress-bar"></div>
       </div>
 
-      <section class="tool-hero">
-        <div class="tool-hero-main">
-          <p class="eyebrow">Telegram Resource Index</p>
-          <h1 class="hero-title">Telegram 中文资源索引</h1>
-          <p class="hero-subtitle">按主题浏览频道和群组，搜索时自动切换为全站结果。</p>
-        </div>
-        <div class="hero-stats" aria-label="收录统计">
-          <div class="hero-stat">
-            <span class="hero-stat-label">总收录</span>
-            <strong class="hero-stat-value">{totalItems}</strong>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat-label">分类</span>
-            <strong class="hero-stat-value">{validSections.length}</strong>
-          </div>
-          {typeStats.map(stat => (
-            <div class="hero-stat">
-              <span class="hero-stat-label">{stat.name}</span>
-              <strong class="hero-stat-value">{stat.count}</strong>
-            </div>
-          ))}
-        </div>
-        <div class="search-box">
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="search-input" placeholder="搜索频道、群组、关键词或 t.me 地址" autocomplete="off" />
-        </div>
-      </section>
-
-      <div class="bulletin" id="bulletin">
-        <span class="bulletin-icon">i</span>
-        <div class="bulletin-text-container">
-          <span id="bulletin-text">本站数据基于 GitHub README 自动构建部署，已收录 {totalItems} 个资源。</span>
-        </div>
+      <div class="mobile-category-strip" aria-label="分类">
+        <a class="mobile-category-item active" href="/" data-id="featured">
+          <span>推荐</span>
+          <strong>{featuredItems.length}</strong>
+        </a>
+        {sectionSummaries.map(section => (
+          <a class="mobile-category-item" href={categoryPath(section.id)} data-id={section.id}>
+            <span>{section.name}</span>
+            <strong>{section.count}</strong>
+          </a>
+        ))}
       </div>
 
       <div id="content-container">
         <section class="category-section" id="active-section" data-current-id={initialSection.id}>
-          <h3 class="category-title">
-            <span id="active-section-title">{initialSection.fullName}</span>
-            <span id="active-section-meta" class="category-title-meta">({initialSection.items.length})</span>
-          </h3>
+          <div class="section-heading">
+            <div>
+              <h1 class="category-title">
+                <span id="active-section-title">{initialSection.fullName}</span>
+                <span id="active-section-meta" class="category-title-meta">({initialSection.items.length})</span>
+              </h1>
+              <p id="active-section-desc" class="category-description">从全站目录抽取一组资源，适合先快速浏览。</p>
+            </div>
+            <div id="result-status" class="result-status" hidden>
+              <span id="result-status-text">已显示推荐资源</span>
+              <button id="result-clear-btn" type="button">清空</button>
+            </div>
+          </div>
           <div class="grid" id="active-grid">
             {initialSection.items.map(item => (
               <Card
@@ -170,15 +237,55 @@ const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道与群组
                 url={item.url}
                 typeName={item.typeName}
                 countStr={item.countStr}
-                category="精选推荐"
+                category={item.categoryName || item.categoryFullName || '精选推荐'}
               />
             ))}
           </div>
         </section>
 
+        <section class="aeo-panel" aria-labelledby="about-rectg-title">
+          <div class="answer-grid">
+            <article>
+              <h2 id="about-rectg-title">rectg 是什么</h2>
+              <p>rectg 是一个中文 Telegram 频道、群组和机器人资源索引，按主题整理公开可访问的 Telegram 资源，方便用户快速搜索、筛选和直达。</p>
+            </article>
+            <article>
+              <h2>怎么使用</h2>
+              <p>可以直接搜索名称、关键词或 t.me 地址，也可以进入分类页浏览。分类页会按订阅数或成员数排序，详情页提供简介、人数、分类和 Telegram 链接。</p>
+            </article>
+            <article>
+              <h2>收录原则</h2>
+              <p>站点只整理公开信息，优先收录有明确主题、简介和稳定链接的资源。广告刷量、违法内容和成人内容不作为推荐方向，用户仍需自行甄别风险。</p>
+            </article>
+          </div>
+
+          <div class="faq-list" aria-label="常见问题">
+            <details open>
+              <summary>rectg 收录哪些 Telegram 资源？</summary>
+              <p>主要收录中文 Telegram 频道、群组和机器人，覆盖新闻、科技、开发、影视、学习、工具、地区社群等主题。</p>
+            </details>
+            <details>
+              <summary>如何搜索 Telegram 频道或群组？</summary>
+              <p>在首页搜索框输入频道名、群组名、主题关键词或 t.me 地址，结果会按标题、分类、简介和链接相关性排序。</p>
+            </details>
+            <details>
+              <summary>如何提交新的频道或群组？</summary>
+              <p>通过 GitHub 的提交收录入口提供名称、链接、类型、简介和主题，后续会根据公开信息和收录原则处理。</p>
+            </details>
+            <details>
+              <summary>订阅数或人数代表什么？</summary>
+              <p>订阅数或人数仅作为浏览参考，可能随 Telegram 实际数据变化而变化，不代表站点背书或质量保证。</p>
+            </details>
+          </div>
+        </section>
+
         <div id="empty-state" class="empty-state" style="display: none;">
-            <h3>未找到匹配的结果</h3>
-            <p>尝试搜索其他关键词</p>
+            <h3>没有匹配结果</h3>
+            <p>换一个关键词，或回到精选推荐继续浏览。</p>
+            <div class="empty-actions">
+              <button type="button" data-empty-action="featured">查看推荐</button>
+              <button type="button" data-empty-action="clear">清空搜索</button>
+            </div>
         </div>
       </div>
     </main>

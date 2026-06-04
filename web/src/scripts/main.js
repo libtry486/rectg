@@ -42,26 +42,62 @@ function readDirectoryData() {
     }
 }
 
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebar-overlay');
-const menuBtn = document.getElementById('menu-btn');
-const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-const themeToggle = document.getElementById('theme-toggle');
-const searchInput = document.getElementById('search-input');
-const toast = document.getElementById('toast');
-const backToTopBtn = document.getElementById('back-to-top');
-const progressBar = document.getElementById('progress-bar');
-const emptyState = document.getElementById('empty-state');
-const contentContainer = document.getElementById('content-container');
-const activeSection = document.getElementById('active-section');
-const activeSectionTitle = document.getElementById('active-section-title');
-const activeSectionMeta = document.getElementById('active-section-meta');
-const activeGrid = document.getElementById('active-grid');
-const directoryData = readDirectoryData();
-const sections = Array.isArray(directoryData.sections) ? directoryData.sections : [];
-const allItems = Array.isArray(directoryData.allItems) ? directoryData.allItems : [];
-let currentSectionId = activeSection?.dataset.currentId || 'featured';
+let sidebar;
+let sidebarOverlay;
+let menuBtn;
+let closeSidebarBtn;
+let themeToggle;
+let searchInput;
+let clearSearchBtn;
+let toast;
+let backToTopBtn;
+let progressBar;
+let emptyState;
+let contentContainer;
+let activeSection;
+let activeSectionTitle;
+let activeSectionMeta;
+let activeSectionDesc;
+let activeGrid;
+let resultStatus;
+let resultStatusText;
+let resultClearBtn;
+let directoryData = { sections: [], allItems: [] };
+let sections = [];
+let allItems = [];
+let currentSectionId = 'featured';
 let toastTimeout;
+
+function collectDomRefs() {
+    sidebar = document.getElementById('sidebar');
+    sidebarOverlay = document.getElementById('sidebar-overlay');
+    menuBtn = document.getElementById('menu-btn');
+    closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    themeToggle = document.getElementById('theme-toggle');
+    searchInput = document.getElementById('search-input');
+    clearSearchBtn = document.getElementById('clear-search-btn');
+    toast = document.getElementById('toast');
+    backToTopBtn = document.getElementById('back-to-top');
+    progressBar = document.getElementById('progress-bar');
+    emptyState = document.getElementById('empty-state');
+    contentContainer = document.getElementById('content-container');
+    activeSection = document.getElementById('active-section');
+    activeSectionTitle = document.getElementById('active-section-title');
+    activeSectionMeta = document.getElementById('active-section-meta');
+    activeSectionDesc = document.getElementById('active-section-desc');
+    activeGrid = document.getElementById('active-grid');
+    resultStatus = document.getElementById('result-status');
+    resultStatusText = document.getElementById('result-status-text');
+    resultClearBtn = document.getElementById('result-clear-btn');
+    directoryData = readDirectoryData();
+    sections = Array.isArray(directoryData.sections) ? directoryData.sections : [];
+    allItems = Array.isArray(directoryData.allItems)
+        ? directoryData.allItems
+        : sections
+            .filter((section) => section.id !== 'featured')
+            .flatMap((section) => section.items || []);
+    currentSectionId = activeSection?.dataset.currentId || 'featured';
+}
 
 function showToast(msg) {
     if (!toast) return;
@@ -88,6 +124,16 @@ function getTelegramUsername(url) {
     if (!url || !url.includes('t.me/')) return '';
     const parts = url.split('t.me/');
     return parts[1]?.split('/')[0]?.split('?')[0] || '';
+}
+
+function parseCount(countStr) {
+    if (!countStr || countStr === '-') return 0;
+    const parsed = Number.parseInt(String(countStr).replace(/,/g, ''), 10);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function categoryPath(categoryId) {
+    return `/category/${encodeURIComponent(categoryId)}/`;
 }
 
 function setHighlightedText(target, text, matchPositions) {
@@ -141,6 +187,7 @@ function createCard(item, matches = {}) {
     const title = item.title || '';
     const desc = item.desc || '';
     const url = item.url || '';
+    const categoryName = item.categoryName || item.categoryFullName || '';
     const username = getTelegramUsername(url);
     const firstLetter = title ? title.substring(0, 1).toUpperCase() : '?';
     const article = document.createElement('article');
@@ -174,7 +221,7 @@ function createCard(item, matches = {}) {
     titleWrap.className = 'card-title-wrap';
 
     const titleLink = document.createElement('a');
-    titleLink.href = `/p/${item.id}`;
+    titleLink.href = `/p/${item.id}/`;
     titleLink.className = 'card-title';
     titleLink.title = title;
     setHighlightedText(titleLink, title, matches.title);
@@ -186,9 +233,15 @@ function createCard(item, matches = {}) {
     tag.className = 'tag';
     tag.textContent = item.typeName || '资源';
 
+    const categoryTag = document.createElement('span');
+    categoryTag.className = 'tag category-tag';
+    categoryTag.title = categoryName;
+    categoryTag.textContent = categoryName || '未分类';
+
     const count = document.createElement('span');
-    count.textContent = `👥 ${item.countStr || '-'}`;
-    meta.append(tag, count);
+    count.className = 'resource-count';
+    count.textContent = `人数 ${item.countStr || '-'}`;
+    meta.append(tag, categoryTag, count);
     titleWrap.append(titleLink, meta);
     header.append(icon, titleWrap);
 
@@ -209,7 +262,7 @@ function createCard(item, matches = {}) {
 
     const detailLink = document.createElement('a');
     detailLink.className = 'card-action';
-    detailLink.href = `/p/${item.id}`;
+    detailLink.href = `/p/${item.id}/`;
     detailLink.textContent = '详情';
 
     const copyBtn = document.createElement('button');
@@ -217,7 +270,10 @@ function createCard(item, matches = {}) {
     copyBtn.type = 'button';
     copyBtn.setAttribute('aria-label', '复制链接');
     copyBtn.dataset.url = url;
-    copyBtn.append(createCopyIcon(), document.createTextNode('复制'));
+    const copyLabel = document.createElement('span');
+    copyLabel.className = 'copy-label';
+    copyLabel.textContent = '复制';
+    copyBtn.append(createCopyIcon(), copyLabel);
 
     actions.append(directLink, detailLink, copyBtn);
     article.append(header, descEl, actions);
@@ -234,7 +290,7 @@ function renderCards(items, matchMap = new Map()) {
 }
 
 function setActiveNav(id) {
-    document.querySelectorAll('.nav-item').forEach((item) => {
+    document.querySelectorAll('.nav-item, .mobile-category-item').forEach((item) => {
         item.classList.toggle('active', item.dataset.id === id);
     });
 }
@@ -242,12 +298,15 @@ function setActiveNav(id) {
 function updateUrl({ sectionId, query, replace = false }) {
     const url = new URL(window.location);
     if (query) {
+        url.pathname = '/';
         url.searchParams.set('q', query);
         url.searchParams.delete('c');
     } else if (sectionId && sectionId !== 'featured') {
-        url.searchParams.set('c', sectionId);
-        url.searchParams.delete('q');
+        url.pathname = categoryPath(sectionId);
+        url.search = '';
+        url.hash = '';
     } else {
+        url.pathname = '/';
         url.searchParams.delete('c');
         url.searchParams.delete('q');
     }
@@ -256,11 +315,27 @@ function updateUrl({ sectionId, query, replace = false }) {
     window.history[method]({}, '', url);
 }
 
-function setSectionHeader(title, count, subtitle = '') {
+function getSectionDescription(section) {
+    if (!section) return '';
+    if (section.id === 'featured') return '从全站目录抽取一组资源，适合先快速浏览。';
+    const keywords = section.keywords ? `，关联关键词：${section.keywords}` : '';
+    return `${section.items?.length || 0} 个资源，按订阅或成员数排序${keywords}。`;
+}
+
+function setSectionHeader(title, count, subtitle = '', description = '') {
     if (activeSectionTitle) activeSectionTitle.textContent = title;
     if (activeSectionMeta) {
         activeSectionMeta.textContent = subtitle || `(${count})`;
     }
+    if (activeSectionDesc) {
+        activeSectionDesc.textContent = description;
+    }
+}
+
+function setResultStatus(message = '', show = false) {
+    if (!resultStatus) return;
+    resultStatus.hidden = !show;
+    if (resultStatusText) resultStatusText.textContent = message;
 }
 
 function renderSection(id, options = {}) {
@@ -270,11 +345,18 @@ function renderSection(id, options = {}) {
     currentSectionId = section.id;
     if (activeSection) activeSection.dataset.currentId = section.id;
     setActiveNav(section.id);
-    setSectionHeader(section.fullName || section.name, section.items?.length || 0);
+    setSectionHeader(
+        section.fullName || section.name,
+        section.items?.length || 0,
+        '',
+        getSectionDescription(section),
+    );
     renderCards(section.items || []);
+    setResultStatus('', false);
     if (emptyState) emptyState.style.display = 'none';
     if (activeSection) activeSection.style.display = '';
     if (searchInput && options.clearSearch) searchInput.value = '';
+    clearSearchBtn?.classList.toggle('visible', Boolean(searchInput?.value?.trim()));
     if (options.updateUrl) updateUrl({ sectionId: section.id });
     if (options.scroll) {
         const top = activeSection
@@ -289,13 +371,29 @@ function getMatches(item, query) {
     const desc = item.desc || '';
     const url = item.url || '';
     const category = [item.categoryFullName, item.categoryKeywords, item.typeName].filter(Boolean).join(' ');
+    const titleLower = title.toLowerCase();
+    const descLower = desc.toLowerCase();
+    const categoryLower = category.toLowerCase();
+    const urlLower = url.toLowerCase();
     const matchTitle = PinyinMatch.match(title, query);
     const matchDesc = PinyinMatch.match(desc, query);
-    const matchCategory = category.toLowerCase().includes(query);
-    const matchUrl = url.toLowerCase().includes(query);
+    const directTitle = titleLower.includes(query);
+    const directDesc = descLower.includes(query);
+    const matchCategory = categoryLower.includes(query);
+    const matchUrl = urlLower.includes(query);
 
-    if (!matchTitle && !matchDesc && !matchCategory && !matchUrl) return null;
-    return { title: matchTitle, desc: matchDesc };
+    if (!matchTitle && !directTitle && !matchDesc && !directDesc && !matchCategory && !matchUrl) return null;
+
+    let score = 4;
+    if (matchTitle || directTitle) score = titleLower.startsWith(query) ? 0 : 1;
+    else if (matchCategory) score = 2;
+    else if (matchDesc || directDesc) score = 3;
+
+    return {
+        title: matchTitle || (directTitle ? [titleLower.indexOf(query), titleLower.indexOf(query) + query.length - 1] : null),
+        desc: matchDesc || (directDesc ? [descLower.indexOf(query), descLower.indexOf(query) + query.length - 1] : null),
+        score,
+    };
 }
 
 function renderSearch(rawQuery, options = {}) {
@@ -306,31 +404,58 @@ function renderSearch(rawQuery, options = {}) {
     }
 
     const matchMap = new Map();
-    const results = allItems.filter((item) => {
+    const results = allItems.reduce((items, item) => {
         const matches = getMatches(item, query);
-        if (!matches) return false;
+        if (!matches) return items;
         matchMap.set(item.id, matches);
-        return true;
+        items.push(item);
+        return items;
+    }, []).sort((a, b) => {
+        const matchA = matchMap.get(a.id);
+        const matchB = matchMap.get(b.id);
+        if ((matchA?.score || 0) !== (matchB?.score || 0)) {
+            return (matchA?.score || 0) - (matchB?.score || 0);
+        }
+        return parseCount(b.countStr) - parseCount(a.countStr);
     });
 
     setActiveNav('');
-    setSectionHeader('搜索结果', results.length, `“${rawQuery.trim()}” · ${results.length} 个资源`);
+    setSectionHeader(
+        '搜索结果',
+        results.length,
+        `“${rawQuery.trim()}” · ${results.length} 个资源`,
+        results.length ? '匹配标题、简介、分类关键词和 t.me 链接。' : '换一个关键词，或使用左侧分类继续浏览。',
+    );
     renderCards(results, matchMap);
+    setResultStatus(
+        results.length
+            ? `按相关性排序，正在查看 “${rawQuery.trim()}”`
+            : `没有找到 “${rawQuery.trim()}”`,
+        true,
+    );
     if (emptyState) emptyState.style.display = results.length ? 'none' : 'block';
     if (activeSection) activeSection.style.display = results.length ? '' : 'none';
+    clearSearchBtn?.classList.toggle('visible', true);
     if (options.updateUrl) updateUrl({ query: rawQuery.trim(), replace: true });
 }
 
 function initTheme() {
     const savedTheme = safeGetStorage('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const themeMeta = document.getElementById('theme-color-meta');
+
+    function syncThemeMeta() {
+        themeMeta?.setAttribute('content', document.body.classList.contains('dark') ? '#111418' : '#ffffff');
+    }
 
     document.body.classList.toggle('dark', savedTheme === 'dark' || (!savedTheme && prefersDark));
+    syncThemeMeta();
 
     themeToggle?.addEventListener('click', () => {
         document.body.classList.toggle('dark');
         const isDark = document.body.classList.contains('dark');
         safeSetStorage('theme', isDark ? 'dark' : 'light');
+        syncThemeMeta();
     });
 }
 
@@ -351,9 +476,15 @@ function initSidebar() {
     closeSidebarBtn?.addEventListener('click', closeSidebar);
     sidebarOverlay?.addEventListener('click', closeSidebar);
 
-    document.querySelectorAll('.nav-item').forEach((item) => {
-        item.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item, .mobile-category-item').forEach((item) => {
+        item.addEventListener('click', (event) => {
             const id = item.dataset.id || 'featured';
+            const href = item.getAttribute('href');
+            if (href && id !== 'featured') {
+                if (window.innerWidth <= 768) closeSidebar();
+                return;
+            }
+            event.preventDefault();
             renderSection(id, { updateUrl: true, clearSearch: true, scroll: true });
             if (window.innerWidth <= 768) closeSidebar();
         });
@@ -361,14 +492,43 @@ function initSidebar() {
 }
 
 function initSearch() {
+    function clearSearch({ focus = true } = {}) {
+        if (!searchInput) return;
+        searchInput.value = '';
+        renderSection(currentSectionId, { updateUrl: true, clearSearch: false, scroll: false });
+        clearSearchBtn?.classList.remove('visible');
+        setResultStatus('', false);
+        if (focus) searchInput.focus();
+    }
+
     searchInput?.addEventListener('input', (event) => {
         renderSearch(event.target.value || '', { updateUrl: true });
+    });
+
+    clearSearchBtn?.addEventListener('click', () => clearSearch());
+    resultClearBtn?.addEventListener('click', () => clearSearch());
+
+    contentContainer?.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const action = target.closest('[data-empty-action]')?.getAttribute('data-empty-action');
+        if (!action) return;
+
+        if (action === 'featured') {
+            if (searchInput) searchInput.value = '';
+            renderSection('featured', { updateUrl: true, clearSearch: false, scroll: true });
+            clearSearchBtn?.classList.remove('visible');
+            setResultStatus('', false);
+        } else if (action === 'clear') {
+            clearSearch();
+        }
     });
 }
 
 async function copyUrl(url) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(url);
+    const clipboard = window.navigator?.clipboard;
+    if (clipboard?.writeText) {
+        await clipboard.writeText(url);
         return true;
     }
 
@@ -422,8 +582,9 @@ function initRouting() {
     const cat = params.get('c');
     const query = params.get('q');
 
-    if (cat) {
-        renderSection(cat, { updateUrl: false, clearSearch: false });
+    if (cat && !query) {
+        window.location.replace(categoryPath(cat));
+        return;
     }
 
     if (query && searchInput) {
@@ -433,6 +594,8 @@ function initRouting() {
 }
 
 function init() {
+    collectDomRefs();
+
     const initTasks = [
         ['theme', initTheme],
         ['sidebar', initSidebar],

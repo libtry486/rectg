@@ -3,6 +3,18 @@ import path from 'path';
 
 export const SITE_URL = 'https://www.rectg.com';
 
+export function absoluteUrl(pathname = '/'): string {
+  return new URL(pathname, SITE_URL).href;
+}
+
+export function categoryPath(categoryId: string): string {
+  return `/category/${encodeURIComponent(categoryId)}/`;
+}
+
+export function itemPath(itemId: string): string {
+  return `/p/${encodeURIComponent(itemId)}/`;
+}
+
 export interface CategoryMeta {
   icon: string;
   name: string;
@@ -54,6 +66,14 @@ export interface DirectoryData {
   featuredItems: DirectoryItem[];
   totalItems: number;
   typeStats: Array<{ name: string; count: number }>;
+}
+
+export interface DetailLinkItem {
+  id: string;
+  title: string;
+  typeName: string;
+  countStr: string;
+  categoryName: string;
 }
 
 export function loadSiteData(): SiteData {
@@ -149,12 +169,26 @@ export function getItemPaths(data = loadSiteData()) {
       categoryName: string;
       categoryFullName: string;
       typeName: string;
+      previousItem: DetailLinkItem | null;
+      nextItem: DetailLinkItem | null;
+      relatedItems: DetailLinkItem[];
     };
   }> = [];
   const seen = new Set<string>();
 
   buildDirectoryData(data).validSections.forEach((section) => {
-    section.items.forEach((item) => {
+    const compactItem = (candidate?: DirectoryItem): DetailLinkItem | null => {
+      if (!candidate) return null;
+      return {
+        id: candidate.id,
+        title: candidate.title,
+        typeName: candidate.typeName,
+        countStr: candidate.countStr,
+        categoryName: candidate.categoryName,
+      };
+    };
+
+    section.items.forEach((item, index) => {
       if (!item.id || seen.has(item.id)) return;
       seen.add(item.id);
       paths.push({
@@ -164,12 +198,31 @@ export function getItemPaths(data = loadSiteData()) {
           categoryName: item.categoryName,
           categoryFullName: item.categoryFullName,
           typeName: item.typeName,
+          previousItem: compactItem(section.items[index - 1]),
+          nextItem: compactItem(section.items[index + 1]),
+          relatedItems: section.items
+            .filter((candidate) => candidate.id !== item.id)
+            .slice(0, 4)
+            .map((candidate) => compactItem(candidate))
+            .filter((candidate): candidate is DetailLinkItem => Boolean(candidate)),
         },
       });
     });
   });
 
   return paths;
+}
+
+export function getCategoryPaths(data = loadSiteData()) {
+  return buildDirectoryData(data).validSections.map((section) => ({
+    params: { id: section.meta.id },
+    props: {
+      section,
+      totalItems: section.items.length,
+      channelCount: section.items.filter((item) => item.typeName === '频道').length,
+      groupCount: section.items.filter((item) => item.typeName === '群组').length,
+    },
+  }));
 }
 
 export function getTelegramUsername(url?: string): string {
