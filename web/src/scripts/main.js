@@ -248,7 +248,7 @@ function createCard(item, matches = {}) {
     const descEl = document.createElement('div');
     descEl.className = 'card-desc';
     descEl.title = desc;
-    setHighlightedText(descEl, desc || '没有描述', matches.desc);
+    setHighlightedText(descEl, desc || '暂无简介', matches.desc);
 
     const actions = document.createElement('div');
     actions.className = 'card-actions';
@@ -258,7 +258,7 @@ function createCard(item, matches = {}) {
     directLink.href = url;
     directLink.target = '_blank';
     directLink.rel = 'noopener noreferrer';
-    directLink.textContent = '直达';
+    directLink.textContent = '打开';
 
     const detailLink = document.createElement('a');
     detailLink.className = 'card-action';
@@ -275,7 +275,7 @@ function createCard(item, matches = {}) {
     copyLabel.textContent = '复制';
     copyBtn.append(createCopyIcon(), copyLabel);
 
-    actions.append(directLink, detailLink, copyBtn);
+    actions.append(detailLink, directLink, copyBtn);
     article.append(header, descEl, actions);
     return article;
 }
@@ -317,7 +317,7 @@ function updateUrl({ sectionId, query, replace = false }) {
 
 function getSectionDescription(section) {
     if (!section) return '';
-    if (section.id === 'featured') return '从全站目录抽取一组资源，适合先快速浏览。';
+    if (section.id === 'featured') return '从全站目录选出的一组入口，按主题分布和人数参考整理。';
     const keywords = section.keywords ? `，关联关键词：${section.keywords}` : '';
     return `${section.items?.length || 0} 个资源，按订阅或成员数排序${keywords}。`;
 }
@@ -424,7 +424,7 @@ function renderSearch(rawQuery, options = {}) {
         '搜索结果',
         results.length,
         `“${rawQuery.trim()}” · ${results.length} 个资源`,
-        results.length ? '匹配标题、简介、分类关键词和 t.me 链接。' : '换一个关键词，或使用左侧分类继续浏览。',
+        results.length ? '按标题、分类、简介和 t.me 链接匹配。' : '换一个关键词，或使用左侧分类继续浏览。',
     );
     renderCards(results, matchMap);
     setResultStatus(
@@ -527,20 +527,31 @@ function initSearch() {
 
 async function copyUrl(url) {
     const clipboard = window.navigator?.clipboard;
-    if (clipboard?.writeText) {
-        await clipboard.writeText(url);
-        return true;
+    try {
+        if (clipboard?.writeText) {
+            await clipboard.writeText(url);
+            return true;
+        }
+    } catch (error) {
+        console.warn('[rectg] clipboard api failed, falling back:', error);
     }
 
     const textarea = document.createElement('textarea');
     textarea.value = url;
+    textarea.setAttribute('readonly', '');
     textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '0';
     textarea.style.opacity = '0';
     document.body.appendChild(textarea);
+    textarea.focus();
     textarea.select();
-    const copied = document.execCommand('copy');
-    document.body.removeChild(textarea);
-    return copied;
+    textarea.setSelectionRange(0, textarea.value.length);
+    try {
+        return document.execCommand('copy');
+    } finally {
+        document.body.removeChild(textarea);
+    }
 }
 
 function initInteractions() {

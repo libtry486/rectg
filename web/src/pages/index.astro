@@ -15,8 +15,8 @@ const categoryCountById = new Map(sectionSummaries.map((section) => [section.id,
 const initialSection = {
   id: 'featured',
   icon: '•',
-  name: '推荐资源',
-  fullName: '精选推荐',
+  name: '目录摘选',
+  fullName: '目录摘选',
   items: featuredItems,
 };
 const summaryStats = [
@@ -38,7 +38,7 @@ const directoryPayload = JSON.stringify({
   ],
 }).replace(/</g, '\\u003c');
 
-const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道和群组，支持分类浏览、关键词搜索、详情页和直达链接。`;
+const pageDescription = `收录 ${totalItems} 个 Telegram 中文频道、群组和机器人，按主题整理公开资源，支持分类浏览、关键词搜索和详情查看。`;
 const homeJsonLd = [
   {
     '@context': 'https://schema.org',
@@ -75,7 +75,7 @@ const homeJsonLd = [
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     '@id': `${SITE_URL}/#featured-items`,
-    name: 'rectg 精选推荐资源',
+    name: 'rectg 目录摘选资源',
     numberOfItems: featuredItems.length,
     itemListElement: featuredItems.map((item, index) => ({
       '@type': 'ListItem',
@@ -93,14 +93,10 @@ const homeJsonLd = [
     <aside id="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" stroke-width="2" fill="none"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 2L11 13"></path>
-            <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
-          </svg>
+          <div class="logo-mark" aria-hidden="true">r</div>
           <div>
             <div class="sidebar-title">rectg</div>
-            <div class="sidebar-subtitle">Telegram 索引</div>
+            <div class="sidebar-subtitle">中文 TG 目录</div>
           </div>
         </div>
         <button id="close-sidebar-btn" aria-label="关闭侧边栏">
@@ -112,10 +108,10 @@ const homeJsonLd = [
         </button>
       </div>
       <nav id="category-nav">
-        <div class="nav-section-label">分类</div>
+        <div class="nav-section-label">目录</div>
         <a class="nav-item active" data-id="featured" href="/">
             <span class="nav-icon">•</span>
-            <span>推荐资源</span>
+            <span>目录摘选</span>
         </a>
         {categories.map(cat => (
           <a class="nav-item" data-id={cat.id} href={categoryPath(cat.id)}>
@@ -174,8 +170,8 @@ const homeJsonLd = [
         </div>
 
         <div class="header-right">
-          <a class="topbar-link" href="https://github.com/jackvale/rectg" target="_blank" rel="noopener">GitHub</a>
-          <a class="topbar-link" href="https://github.com/jackvale/rectg/issues/new?template=channel_submission.md" target="_blank" rel="noopener">提交</a>
+          <a class="topbar-link" href="https://github.com/jackvale/rectg" target="_blank" rel="noopener">源码</a>
+          <a class="topbar-link" href="https://github.com/jackvale/rectg/issues/new?template=channel_submission.md" target="_blank" rel="noopener">收录</a>
           <button id="theme-toggle" aria-label="切换主题">
             <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -202,7 +198,7 @@ const homeJsonLd = [
 
       <div class="mobile-category-strip" aria-label="分类">
         <a class="mobile-category-item active" href="/" data-id="featured">
-          <span>推荐</span>
+          <span>摘选</span>
           <strong>{featuredItems.length}</strong>
         </a>
         {sectionSummaries.map(section => (
@@ -221,10 +217,10 @@ const homeJsonLd = [
                 <span id="active-section-title">{initialSection.fullName}</span>
                 <span id="active-section-meta" class="category-title-meta">({initialSection.items.length})</span>
               </h1>
-              <p id="active-section-desc" class="category-description">从全站目录抽取一组资源，适合先快速浏览。</p>
+              <p id="active-section-desc" class="category-description">从全站目录选出的一组入口，按主题分布和人数参考整理。</p>
             </div>
             <div id="result-status" class="result-status" hidden>
-              <span id="result-status-text">已显示推荐资源</span>
+              <span id="result-status-text">已显示目录摘选</span>
               <button id="result-clear-btn" type="button">清空</button>
             </div>
           </div>
@@ -237,40 +233,35 @@ const homeJsonLd = [
                 url={item.url}
                 typeName={item.typeName}
                 countStr={item.countStr}
-                category={item.categoryName || item.categoryFullName || '精选推荐'}
+                category={item.categoryName || item.categoryFullName || '目录摘选'}
               />
             ))}
           </div>
         </section>
 
-        <section class="aeo-panel" aria-labelledby="about-rectg-title">
-          <div class="answer-grid">
-            <article>
-              <h2 id="about-rectg-title">rectg 是什么</h2>
-              <p>rectg 是一个中文 Telegram 频道、群组和机器人资源索引，按主题整理公开可访问的 Telegram 资源，方便用户快速搜索、筛选和直达。</p>
-            </article>
-            <article>
-              <h2>怎么使用</h2>
-              <p>可以直接搜索名称、关键词或 t.me 地址，也可以进入分类页浏览。分类页会按订阅数或成员数排序，详情页提供简介、人数、分类和 Telegram 链接。</p>
-            </article>
-            <article>
-              <h2>收录原则</h2>
-              <p>站点只整理公开信息，优先收录有明确主题、简介和稳定链接的资源。广告刷量、违法内容和成人内容不作为推荐方向，用户仍需自行甄别风险。</p>
-            </article>
+        <section class="aeo-panel directory-note" aria-labelledby="about-rectg-title">
+          <div class="directory-note-main">
+            <h2 id="about-rectg-title">关于本站</h2>
+            <p>rectg 是一个中文 Telegram 公开资源目录，整理频道、群组和机器人入口。目录按主题归类，保留人数、简介、详情页和 Telegram 链接，适合用来查找同类资源和做加入前的初步核对。</p>
+          </div>
+          <div class="directory-note-meta" aria-label="目录说明">
+            <span>{totalItems} 个资源</span>
+            <span>{validSections.length} 个分类</span>
+            <span>公开信息整理</span>
           </div>
 
-          <div class="faq-list" aria-label="常见问题">
-            <details open>
+          <div class="faq-list compact-faq" aria-label="常见问题">
+            <details>
               <summary>rectg 收录哪些 Telegram 资源？</summary>
               <p>主要收录中文 Telegram 频道、群组和机器人，覆盖新闻、科技、开发、影视、学习、工具、地区社群等主题。</p>
             </details>
             <details>
-              <summary>如何搜索 Telegram 频道或群组？</summary>
+              <summary>怎样查找频道或群组？</summary>
               <p>在首页搜索框输入频道名、群组名、主题关键词或 t.me 地址，结果会按标题、分类、简介和链接相关性排序。</p>
             </details>
             <details>
-              <summary>如何提交新的频道或群组？</summary>
-              <p>通过 GitHub 的提交收录入口提供名称、链接、类型、简介和主题，后续会根据公开信息和收录原则处理。</p>
+              <summary>怎样提交新的资源？</summary>
+              <p>通过项目收录入口提供名称、链接、类型、简介和主题，后续会根据公开信息和收录原则处理。</p>
             </details>
             <details>
               <summary>订阅数或人数代表什么？</summary>
@@ -281,9 +272,9 @@ const homeJsonLd = [
 
         <div id="empty-state" class="empty-state" style="display: none;">
             <h3>没有匹配结果</h3>
-            <p>换一个关键词，或回到精选推荐继续浏览。</p>
+            <p>换一个关键词，或回到目录摘选继续浏览。</p>
             <div class="empty-actions">
-              <button type="button" data-empty-action="featured">查看推荐</button>
+              <button type="button" data-empty-action="featured">查看摘选</button>
               <button type="button" data-empty-action="clear">清空搜索</button>
             </div>
         </div>
@@ -303,8 +294,8 @@ const homeJsonLd = [
 
   <footer class="site-footer">
     <div class="footer-content">
-      <p>⚠️ <strong>免责声明</strong>：本网站仅供技术学习与信息导航使用。严禁中国大陆地区用户使用，所有使用者须严格遵守所在地区法律法规，一切因违规使用产生的法律责任均与本网站无关。</p>
-      <p class="footer-copyright">© 2026 rectg – Telegram 精选导航</p>
+      <p><strong>站点说明</strong>：本网站只整理公开 Telegram 资源入口，不运营或代表被收录资源。访问和加入前请自行核对内容风险，并遵守所在地法律法规。</p>
+      <p class="footer-copyright">© 2026 rectg – Telegram 中文目录</p>
     </div>
   </footer>
 

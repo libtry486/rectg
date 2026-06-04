@@ -40,10 +40,10 @@ const colorClass = getAvatarColorClass(firstLetter);
             </div>
         </div>
     </div>
-    <div class="card-desc" title={desc}>{desc || '没有描述'}</div>
+    <div class="card-desc" title={desc}>{desc || '暂无简介'}</div>
     <div class="card-actions">
-        <a class="card-action card-action-primary" href={url} target="_blank" rel="noopener noreferrer">直达</a>
         <a class="card-action" href={`/p/${id}/`}>详情</a>
+        <a class="card-action card-action-primary" href={url} target="_blank" rel="noopener noreferrer">打开</a>
         <button class="card-action card-copy-btn" type="button" aria-label="复制链接" data-url={url}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
