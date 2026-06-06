@@ -1,41 +1,12 @@
 <h1 align="center">rectg</h1>
 
-<p align="center">Telegram 中文频道、群组与机器人精选索引</p>
+<p align="center">552 个 Telegram 中文资源 · 22 个主题分类</p>
 
 <p align="center">
   <a href="https://www.rectg.com/"><strong>在线浏览</strong></a>
   ·
   <a href="https://github.com/jackvale/rectg/issues/new?template=channel_submission.md">提交收录</a>
 </p>
-
-> **rectg** 持续收录高质量 Telegram 中文频道、群组与机器人，结合自动化抓取与人工整理，帮助你更高效地发现值得关注的 TG 资源。
-> 
-> 本项目基于公开信息整理，仅作导航与研究参考；请自行甄别内容并遵守所在地法律法规。
-
-## 项目特点
-
-- 覆盖新闻快讯、数码科技、开发运维、软件工具、影视剧集、学习阅读等中文 Telegram 主题资源。
-- 数据结合自动化抓取、规则过滤与人工整理，按频道、群组、机器人和主题分类输出。
-- 订阅数和成员数仅作发现参考，不代表项目背书；资源简介会做压缩展示，完整信息以 Telegram 页面为准。
-- 在线站点支持搜索、分类筛选和详情页浏览：[https://www.rectg.com/](https://www.rectg.com/)。
-
-## 如何使用
-
-1. 优先访问 [https://www.rectg.com/](https://www.rectg.com/) 搜索或筛选资源。
-2. 在下方 `快速导航` 中按频道、群组和主题跳转到对应目录。
-3. 点击资源名称会跳转到 Telegram，请在加入前自行确认内容质量、活跃度和规则。
-
-## 收录与反馈
-
-- 新资源推荐请通过 [收录申请](https://github.com/jackvale/rectg/issues/new?template=channel_submission.md) 提交。
-- 提交时请提供资源名称、完整链接、类型、简介、语言和主题，方便维护时判断是否适合收录。
-- 不接受广告刷量、成人或违法内容、无关链接、批量灌水和重复提交。
-
-## 收录原则与免责声明
-
-- 本项目只整理公开可见信息，不拥有、不运营、不代表任何被收录的 Telegram 资源。
-- 分类、简介和人数可能因 Telegram 页面变化、抓取时点或人工判断而滞后。
-- 请遵守所在地法律法规和 Telegram 社区规则，自行承担访问、加入和使用相关资源的风险。
 
 ## 数据概览
 
@@ -47,8 +18,6 @@
     <td align="center"><strong>283</strong><br><sub>群组 · Group</sub></td>
   </tr>
 </table>
-
-以下数据由当前 SQLite 数据库自动生成，完整目录保留在 README 中，便于 GitHub 内浏览和引用。
 
 ## 快速导航
 
